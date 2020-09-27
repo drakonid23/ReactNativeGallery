@@ -7,6 +7,7 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 
 const Stack = createStackNavigator();
 
+//Главная ф-ция
 export default function App() {
   return (
     <NavigationContainer>
@@ -20,11 +21,11 @@ export default function App() {
     </NavigationContainer>
   );
 }
-
+//Главный экран
 const HomeScreen =({navigation}) =>{
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-
+  //Получение изображений с unsplash.com
   useEffect(() => {
     fetch('https://api.unsplash.com/search/photos.json/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0&query=dogs')
       .then((response) => response.json())
@@ -33,18 +34,20 @@ const HomeScreen =({navigation}) =>{
       .finally(() => setLoading(false));
   }, []);
   return(
-    <View style={{ flex: 1, padding: 24 }}>
+    <View>
       {isLoading ? <ActivityIndicator/> : (
         <FlatList
           data={data}
           keyExtractor={({ id }, index) => id}
           renderItem={({ item }) => (
             <View style={styles.container}>
+              {/* Вывести увеличенную фотографию */}
           <TouchableHighlight onPress={() =>
             navigation.navigate('Photo', { imageLink: item.urls.small })} >
-            <Image style={styles.tiny_logo} source={{uri:item.urls.small}}/>
+            <Image style={styles.tiny_image} source={{uri:item.urls.small}}/>
           </TouchableHighlight>
-          <View style={{width: 130, marginLeft:10}}>
+          {/* Информация о фотографии */}
+          <View style={styles.description}>
           <Text > Description: {item.description} </Text>         
           <Text > Author: {item.user.username}</Text>
           </View>
@@ -55,17 +58,15 @@ const HomeScreen =({navigation}) =>{
     </View>
   );
 }
+//Экран с фотографией
 const PhotoScreen = ({route, navigation}) =>{
   const {imageLink} = route.params;
   return (
-    <View style={styles.imageConfig}>
-    <Image style={styles.fullImage} source={{uri:imageLink}}/>
-    </View>
-
+    <Image style={styles.full_image} source={{uri:imageLink}}/>
   )
 }
 
-
+//Стили
 const styles = StyleSheet.create({
   container: {
     flex:1,
@@ -73,16 +74,14 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 5,
   },
-  imageConfig:{
-    justifyContent:'center',
-    alignContent:'center',
-    resizeMode:'center'
+  description:{
+    width: 130, marginLeft:10
   },
-  fullImage:{
-    height: 400,
+  full_image:{
+    height: 500,
     resizeMode:'contain'
   },
-  tiny_logo:{
+  tiny_image:{
     marginTop: 5,
     marginBottom: 5,
     height: 200,
